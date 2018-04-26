@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RSAsecurity {
-    public static Map<String,String> getKey(int length){
+    public static Map<String, String> getKey(int length) {
         try {
             //1.初始化秘钥
 
@@ -34,7 +34,7 @@ public class RSAsecurity {
             String publicKey = encoder.encodeToString(publicKeyByte);
             String privateKey = encoder.encodeToString(privateKeyByte);
 
-            Map<String,String> map = new HashMap<String,String>();
+            Map<String, String> map = new HashMap<String, String>();
 
             map.put("publicKey", publicKey);
 
@@ -45,7 +45,7 @@ public class RSAsecurity {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        return new HashMap<String,String>();
+        return new HashMap<String, String>();
     }
 
     /*RSA 工具类。提供加密，解密，生成密钥对等方法。
@@ -62,7 +62,7 @@ public class RSAsecurity {
     * 速度一直是RSA的缺陷。一般来说只用于少量数据 加密。*/
 
     public static void priENpubDE() {
-        String src="RSA 加密字符串";
+        String src = "RSA 加密字符串";
         try {
             //1.初始化秘钥
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -83,31 +83,31 @@ public class RSAsecurity {
             Base64.Decoder decoder = Base64.getDecoder();
 
             PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(decoder.decode(privateKeyStr));
-            KeyFactory keyFactory =KeyFactory.getInstance("RSA");
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
             //Cipher类为加密和解密提供密码功能，通过getinstance实例化对象
-            Cipher cipher =Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA");
             //初始化加密
-            cipher.init(Cipher.ENCRYPT_MODE,privateKey);
+            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
             byte[] result = cipher.doFinal(src.getBytes());
-            System.out.println("私钥加密，公钥解密----加密:"+encoder.encodeToString(result));
+            System.out.println("私钥加密，公钥解密----加密:" + encoder.encodeToString(result));
 
             //3.私钥加密，公钥解密----解密
             //生成公钥
             X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(decoder.decode(publicKeyStr));
-            keyFactory=KeyFactory.getInstance("RSA");
-            PublicKey publicKey= keyFactory.generatePublic(x509EncodedKeySpec);
+            keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
             cipher = Cipher.getInstance("RSA");
             //初始化解密
-            cipher.init(Cipher.DECRYPT_MODE,publicKey);
+            cipher.init(Cipher.DECRYPT_MODE, publicKey);
             result = cipher.doFinal(result);
-            System.out.println("私钥加密，公钥解密----解密:"+new String(result));
+            System.out.println("私钥加密，公钥解密----解密:" + new String(result));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static String deByPubKey(String encryptString, String pubKeyString){
+    public static String deByPubKey(String encryptString, String pubKeyString) {
         try {
             Base64.Decoder decoder = Base64.getDecoder();
             X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(decoder.decode(pubKeyString));
@@ -120,13 +120,13 @@ public class RSAsecurity {
             byte[] encryptToArray = decoder.decode(encryptString);
             byte[] result = cipher.doFinal(encryptToArray);
             return new String(result);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
     }
 
-    public static String enByPriKey(String rawText, String priKeyString){
+    public static String enByPriKey(String rawText, String priKeyString) {
         try {
             Base64.Decoder decoder = Base64.getDecoder();
 
@@ -140,14 +140,14 @@ public class RSAsecurity {
             byte[] result = cipher.doFinal(rawText.getBytes());
             Base64.Encoder encoder = Base64.getEncoder();
             return encoder.encodeToString(result);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
     }
 
     public static void pubENpriDE() {
-        String src="RSA 加密字符串";
+        String src = "RSA 加密字符串";
         try {
             //1.初始化秘钥
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -161,30 +161,69 @@ public class RSAsecurity {
             RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
 
             //2.公钥加密，私钥解密----加密
-            X509EncodedKeySpec x509EncodedKeySpec=new X509EncodedKeySpec(rsaPublicKey.getEncoded());
+            X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(rsaPublicKey.getEncoded());
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
             //初始化加密
             //Cipher类为加密和解密提供密码功能，通过getinstance实例化对象
-            Cipher cipher =Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE,publicKey);
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             //加密字符串
             byte[] result = cipher.doFinal(src.getBytes());
             Base64.Encoder encoder = Base64.getEncoder();
 
-            System.out.println("公钥加密，私钥解密----加密:"+encoder.encodeToString(result));
+            System.out.println("公钥加密，私钥解密----加密:" + encoder.encodeToString(result));
 
             //3.公钥加密，私钥解密-----解密
             PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(rsaPrivateKey.getEncoded());
-            keyFactory=KeyFactory.getInstance("RSA");
-            PrivateKey  privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
+            keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
             //初始化解密
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             //解密字符串
             result = cipher.doFinal(result);
-            System.out.println("公钥加密，私钥解密-----解密:"+new String(result));
+            System.out.println("公钥加密，私钥解密-----解密:" + new String(result));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static byte[] MD5WithRsaSignPri(String privateKeyString, String rawText) {
+        try {
+            Base64.Decoder decoder = Base64.getDecoder();
+            PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(decoder.decode(privateKeyString));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
+            Signature signature = Signature.getInstance("MD5withRSA");
+            //初始化私钥
+            signature.initSign(privateKey);
+            //传入签名内容
+            signature.update(rawText.getBytes("UTF-8"));
+            //生成签名
+            byte[] result = signature.sign();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static boolean IsSignOk(String publicKeyString, byte[] signData, String rawText) {
+        try {
+            Base64.Decoder decoder = Base64.getDecoder();
+            X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(decoder.decode(publicKeyString));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
+            Signature signature = Signature.getInstance("MD5withRSA");
+            //初始化公钥
+            signature.initVerify(publicKey);
+            //传入签名内容
+            signature.update(rawText.getBytes("UTF-8"));
+            //核对签名
+            boolean isVerify = signature.verify(signData);
+            return  isVerify;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
